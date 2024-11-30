@@ -47,14 +47,14 @@ class camera:
 
     def get_ray(self, i:int, j:int) -> ray:
         offset = self.sample_square()
-        pixel_sample = self.pixel00_loc + ((i + offset.x()) * self.pixel_delta_u) + ((j + offset.y()) * self.pixel_delta_v);
+        pixel_sample = self.pixel00_loc + (self.pixel_delta_u * (i + offset.x())) + (self.pixel_delta_v * (j + offset.y()))
         
         ray_origin = self.center
         ray_direction = pixel_sample - ray_origin
         return ray(ray_origin, ray_direction)
     
     def sample_square(self) -> vec3:
-        return vec3(np.array([random_double() - 0.5, random_double() - 0.5, 0]))
+        return vec3(np.array([random_double() - 0.5, random_double() - 0.5, 0.0]))
 
     def ray_color(self, r: ray, world: hittable) -> color:
         does_hit, info_rec = world.hit(r, interval(0, infinity))
@@ -87,9 +87,7 @@ class camera:
                 pixel_color = color(np.array([0,0,0]))
                 for sample in range(self.samples_per_pixel):
                     r = self.get_ray(i, j)
-                    pixel_color += self.ray_color(r, world)
-                write_color(file_name, self.pixel_sample_scale * pixel_color)
+                    pixel_color = pixel_color + self.ray_color(r, world)
+                write_color(file_name, pixel_color*self.pixel_samples_scale)
         
-        print("\rDone.                 \n", file=sys.stderr)
-
-        
+        print("\rDone.                 \n", file=sys.stderr)       
