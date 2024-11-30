@@ -1,4 +1,4 @@
-from vec3_class import vec3, dot, cross, unit_vector
+from vec3_class import vec3, dot, cross, unit_vector, random_on_hemisphere
 from color_func import write_color
 from ray_class import ray
 import sys
@@ -59,7 +59,9 @@ class camera:
     def ray_color(self, r: ray, world: hittable) -> color:
         does_hit, info_rec = world.hit(r, interval(0, infinity))
         if does_hit:
-            return (info_rec.normal + color(np.array([1,1,1]))) * 0.5
+            # return (info_rec.normal + color(np.array([1,1,1]))) * 0.5
+            direction = random_on_hemisphere(info_rec.normal)
+            return self.ray_color(ray(info_rec.p, direction), world) * 0.5
 
         unit_direction = unit_vector(r.direction())
         a = 0.5*(unit_direction.y()+1.0)

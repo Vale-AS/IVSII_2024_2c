@@ -1,4 +1,5 @@
 import numpy as np
+from rtweekend import random_double
 
 class vec3:
     e = [None]*3
@@ -80,6 +81,7 @@ class vec3:
     
     def __truediv__(self, t: float):
         return self * (1/t)
+
     
 def dot(u: vec3, v: vec3) -> float: 
     #return u.e[0]*v.e[0] + u.e[1]*v.e[1] + u.e[2]*v.e[2]
@@ -90,9 +92,9 @@ def cross(u: vec3, v: vec3) -> vec3:
     #            u.e[2] * v.e[0] - u.e[0] * v.e[2],
     #            u.e[0] * v.e[1] - u.e[1] * v.e[0])
 
-    #cross_e = np.linalg.cross(u.e, v.e)
-    #return vec3(cross_e[0], cross_e[1], cross_e[2])
-    return vec3(np.linalg.cross(u.e, v.e))
+    cross_e = np.linalg.cross(u.e, v.e)
+    return vec3(cross_e[0], cross_e[1], cross_e[2])
+
 
 def unit_vector(v: vec3) -> vec3 :
     norm = np.linalg.norm(v.e)
@@ -100,4 +102,22 @@ def unit_vector(v: vec3) -> vec3 :
         return v
     else:
         return v / norm
-    #return v / v.length()
+    
+    #return v / v.length()#return v / v.length()
+
+def random(min: float = 0, max: float = 1):
+        return vec3(np.array([random_double(min, max), random_double(min, max), random_double(min, max)]))
+
+def random_unit_vector():
+    while(True):
+        p = random(-1,1)
+        lensq = p.length_squared()
+        if 1e-160 < lensq and lensq <= 1:
+            return p / np.sqrt(lensq)
+
+def random_on_hemisphere(normal: vec3):
+    on_unit_sphere = random_unit_vector()
+    if (dot(on_unit_sphere, normal) > 0.0): # in same hemisphere as normal
+        return on_unit_sphere
+    else:
+        return -on_unit_sphere

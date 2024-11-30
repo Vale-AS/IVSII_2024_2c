@@ -40,7 +40,7 @@ def main():
     cam.image_width = 400
     cam.samples_per_pixel = 10
 
-    cam.render(world, "image11.ppm")
+    cam.render(world, "images/image12.ppm")
 
 
 main()
