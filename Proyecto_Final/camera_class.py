@@ -6,7 +6,7 @@ import numpy as np
 from hittable_class import hittable, hit_record
 from hittable_list_class import hittable_list
 from sphere_class import sphere
-from rtweekend import infinity
+from rtweekend import infinity, random_double
 from interval_class import interval
 
 color = vec3
@@ -17,13 +17,16 @@ class camera:
     # Image
     aspect_ratio = 1.0
     image_width = 100
+    samples_per_pixel = 10
 
     def initialize(self):
 
         # Calculate image height, ensure it's at least 1
         self.image_height = int(self.image_width / self.aspect_ratio)
         self.image_height = 1 if (self.image_height < 1) else self.image_height
+        self.pixel_samples_scale = 1.0 / self.samples_per_pixel
 
+        
         # Camera
         focal_length = 1.0
         viewport_height = 2.0
@@ -42,8 +45,18 @@ class camera:
         viewport_upper_left = self.center - vec3(np.array([0, 0, focal_length])) - viewport_u/2 - viewport_v/2
         self.pixel00_loc = viewport_upper_left + (self.pixel_delta_u + self.pixel_delta_v) * 0.5
 
+    def get_ray(self, i:int, j:int) -> ray:
+        offset = self.sample_square()
+        pixel_sample = self.pixel00_loc + ((i + offset.x()) * self.pixel_delta_u) + ((j + offset.y()) * self.pixel_delta_v);
+        
+        ray_origin = self.center
+        ray_direction = pixel_sample - ray_origin
+        return ray(ray_origin, ray_direction)
+    
+    def sample_square(self) -> vec3:
+        return vec3(np.array([random_double() - 0.5, random_double() - 0.5, 0]))
 
-    def ray_color(self, r: ray, world: hittable):
+    def ray_color(self, r: ray, world: hittable) -> color:
         does_hit, info_rec = world.hit(r, interval(0, infinity))
         if does_hit:
             return (info_rec.normal + color(np.array([1,1,1]))) * 0.5
@@ -63,12 +76,19 @@ class camera:
         for j in range(self.image_height):
             print(f'\rScanlines remaining {self.image_height-j} ', file=sys.stderr)
             for i in range(self.image_width):
-                pixel_center = self.pixel00_loc + (self.pixel_delta_u * i) + (self.pixel_delta_v * j)
-                ray_direction = pixel_center - self.center
-                r = ray(self.center, ray_direction)
 
-                pixel_color = self.ray_color(r, world)
-                write_color(file_name,pixel_color)
+                # pixel_center = self.pixel00_loc + (self.pixel_delta_u * i) + (self.pixel_delta_v * j)
+                # ray_direction = pixel_center - self.center
+                # r = ray(self.center, ray_direction)
+
+                # pixel_color = self.ray_color(r, world)
+                # write_color(file_name,pixel_color)
+                
+                pixel_color = color(np.array([0,0,0]))
+                for sample in range(self.samples_per_pixel):
+                    r = self.get_ray(i, j)
+                    pixel_color += self.ray_color(r, world)
+                write_color(file_name, self.pixel_sample_scale * pixel_color)
         
         print("\rDone.                 \n", file=sys.stderr)
 
