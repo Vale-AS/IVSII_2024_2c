@@ -68,28 +68,36 @@ class camera:
         return color(np.array([1.0,1.0,1.0]))*(1.0-a) + color(np.array([0.5,0.7,1.0]))*a
         
 
-    def render(self, world: hittable, file_name: str):
+    def render(self, world: hittable, filename: str = None):
 
         self.initialize()
 
-        with open(file_name, "w") as file:
-            file.write(f'P3\n{self.image_width} {self.image_height}\n255\n')
+        if filename:
+            with open(filename, "w") as file:
+                file.write(f'P3\n{self.image_width} {self.image_height}\n255\n')
+        else:
+            print(f'P3\n{self.image_width} {self.image_height}\n255\n')
 
         for j in range(self.image_height):
-            print(f'\rScanlines remaining {self.image_height-j} ', file=sys.stderr)
+
+            print(f'\rScanlines remaining {self.image_height-j}   {zigzag[j%8]}', file=sys.stderr)
             for i in range(self.image_width):
-
-                # pixel_center = self.pixel00_loc + (self.pixel_delta_u * i) + (self.pixel_delta_v * j)
-                # ray_direction = pixel_center - self.center
-                # r = ray(self.center, ray_direction)
-
-                # pixel_color = self.ray_color(r, world)
-                # write_color(file_name,pixel_color)
                 
                 pixel_color = color(np.array([0,0,0]))
                 for sample in range(self.samples_per_pixel):
                     r = self.get_ray(i, j)
                     pixel_color = pixel_color + self.ray_color(r, world)
-                write_color(file_name, pixel_color*self.pixel_samples_scale)
+                write_color(filename, pixel_color*self.pixel_samples_scale)
         
-        print("\rDone.                 \n", file=sys.stderr)       
+        print("\rDone.                 \n", file=sys.stderr)
+
+zigzag = [
+    "*    ",
+    " *   ",
+    "  *  ",
+    "   * ",
+    "    *",
+    "   * ",
+    "  *  ",
+    " *   ",
+]
