@@ -1,4 +1,4 @@
-from vec3_class import vec3, dot, cross, unit_vector, random_on_hemisphere
+from vec3_class import vec3, dot, cross, unit_vector, random_on_hemisphere, random_unit_vector
 from color_func import write_color
 from ray_class import ray
 import sys
@@ -8,6 +8,7 @@ from hittable_list_class import hittable_list
 from sphere_class import sphere
 from rtweekend import infinity, random_double
 from interval_class import interval
+from material_class import material
 
 color = vec3
 point3 = vec3
@@ -18,6 +19,7 @@ class camera:
     aspect_ratio = 1.0
     image_width = 100
     samples_per_pixel = 10
+    max_depth = 10
 
     def initialize(self):
 
@@ -56,12 +58,18 @@ class camera:
     def sample_square(self) -> vec3:
         return vec3(np.array([random_double() - 0.5, random_double() - 0.5, 0.0]))
 
-    def ray_color(self, r: ray, world: hittable) -> color:
-        does_hit, info_rec = world.hit(r, interval(0, infinity))
+    def ray_color(self, r: ray, depth: int, world: hittable) -> color:
+        if depth <= 0:
+            return color(np.array([0,0,0]))
+
+        does_hit, info_rec = world.hit(r, interval(0.001, infinity))
         if does_hit:
-            # return (info_rec.normal + color(np.array([1,1,1]))) * 0.5
-            direction = random_on_hemisphere(info_rec.normal)
-            return self.ray_color(ray(info_rec.p, direction), world) * 0.5
+            has_material, scattered, attenuation = info_rec.mat.scatter(r, info_rec)
+            if has_material:
+                return self.ray_color(scattered, depth-1, world) * attenuation
+            return color(np.array([0,0,0]))
+            # direction = info_rec.normal + random_unit_vector()
+            #return self.ray_color(ray(info_rec.p, direction), depth-1, world) * 0.5
 
         unit_direction = unit_vector(r.direction())
         a = 0.5*(unit_direction.y()+1.0)
@@ -86,18 +94,18 @@ class camera:
                 pixel_color = color(np.array([0,0,0]))
                 for sample in range(self.samples_per_pixel):
                     r = self.get_ray(i, j)
-                    pixel_color = pixel_color + self.ray_color(r, world)
+                    pixel_color = pixel_color + self.ray_color(r, self.max_depth, world)
                 write_color(filename, pixel_color*self.pixel_samples_scale)
         
         print("\rDone.                 \n", file=sys.stderr)
 
 zigzag = [
-    "*    ",
-    " *   ",
-    "  *  ",
-    "   * ",
-    "    *",
-    "   * ",
-    "  *  ",
-    " *   ",
+    "<3    ",
+    " <3   ",
+    "  <3  ",
+    "   <3 ",
+    "    <3",
+    "   <3 ",
+    "  <3  ",
+    " <3   ",
 ]

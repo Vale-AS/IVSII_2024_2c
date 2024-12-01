@@ -50,6 +50,9 @@ class vec3:
     def length(self):
         return np.sqrt(self.length_squared())
     
+    def near_zero(self):
+        return np.allclose(self.e, np.zeros(3))
+
     def __add__(self, v):
         #return vec3(self.e[0] + v.e[0], self.e[1] + v.e[1], self.e[2] + v.e[2])
 
@@ -72,12 +75,15 @@ class vec3:
 
         return vec3(self.e * v.e)
     
-    def __mul__(self, t: float):
+    def __mul__(self, t):
         #return vec3(t*self.e[0], t*self.e[1], t*self.e[2])
 
         #mul_e = self.e * t
         #return vec3(mul_e[0], mul_e[1], mul_e[2])
-        return vec3(self.e * t)
+        if isinstance(t, vec3):
+            return vec3(self.e * t.e)
+        else: 
+            return vec3(self.e * t)
     
     def __truediv__(self, t: float):
         return self * (1/t)
@@ -121,3 +127,6 @@ def random_on_hemisphere(normal: vec3):
         return on_unit_sphere
     else:
         return -on_unit_sphere
+
+def reflect(v: vec3, n:vec3):
+    return v - n*dot(v,n)*2
