@@ -108,3 +108,11 @@ def reflectNumba(v: np.ndarray, n:np.ndarray):
 
 def reflect(v: vec3, n:vec3):
     return vec3(reflectNumba(v.e,n.e))
+
+
+def refract(uv: vec3, n: vec3, etai_over_etat: float):
+    
+    cos_theta = min(dot(-uv, n), 1.0)
+    r_out_perp = (uv + n*cos_theta) * etai_over_etat
+    r_out_parallel =  n * -np.sqrt(abs(1.0 - r_out_perp.length_squared()))
+    return r_out_perp + r_out_parallel

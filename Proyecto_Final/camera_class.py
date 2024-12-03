@@ -87,8 +87,8 @@ class camera:
             print(f'P3\n{self.image_width} {self.image_height}\n255\n')
 
         for j in range(self.image_height):
-
-            print(f'\rScanlines remaining {self.image_height-j}   {zigzag[j%8]}', file=sys.stderr)
+            print(f'\rScanlines remaining {self.image_height-j}   {cajitas[j%12]}', file=sys.stderr)
+            print ("\033[A\033[A", file=sys.stderr) 
             for i in range(self.image_width):
                 
                 pixel_color = color(np.array([0,0,0]))
@@ -99,13 +99,20 @@ class camera:
         
         print("\rDone.                 \n", file=sys.stderr)
 
+
+cajitas = ["▁","▃","▄","▅","▆","▇","█","▇","▆","▅","▄","▃"]
+
 zigzag = [
-    "<3    ",
-    " <3   ",
-    "  <3  ",
-    "   <3 ",
-    "    <3",
-    "   <3 ",
-    "  <3  ",
-    " <3   ",
+    "<3      ",
+    " <3     ",
+    "  <3    ",
+    "   <3   ",
+    "    <3  ",
+    "     <3 ",
+    "      <3",
+    "     <3 ",
+    "    <3  ",
+    "   <3   ",
+    "  <3    ",
+    " <3     ",
 ]
