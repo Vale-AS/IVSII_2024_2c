@@ -1,15 +1,9 @@
 import numpy as np
 from rtweekend import random_double
+from numba import njit
 
 class vec3:
     e = [None]*3
-
-    #def __init__(self):
-    #    self.e = [0,0,0]
-    
-    #def __init__(self, e0: float, e1: float, e2: float):
-    #    #self.e = [e0, e1, e2]
-    #    self.e = np.array([e0,e1,e2])
 
     def __init__(self, coords: np.ndarray):
         self.e = coords
@@ -19,19 +13,12 @@ class vec3:
     def z(self): return self.e[2]
 
     def __neg__(self):
-        #return vec3(-self.e[0],-self.e[1],-self.e[2])
-        
-        #neg_e = np.negative(self.e)
-        #return vec3(neg_e[0],neg_e[1],neg_e[2])
         return vec3(np.negative(self.e))
     
     def __getitem__(self, i: int):
         return self.e[i]
     
     def __iadd__(self, v):
-        #self.e[0] += v.e[0]
-        #self.e[1] += v.e[1]
-        #self.e[2] += v.e[2]
         self.e += v.e
         return self
     
@@ -44,7 +31,6 @@ class vec3:
         return self
     
     def length_squared(self) -> float:
-        #return self.e[0]**2 + self.e[1]**2 + self.e[2]**2
         return np.dot(self.e, self.e)
     
     def length(self):
@@ -54,32 +40,15 @@ class vec3:
         return np.allclose(self.e, np.zeros(3))
 
     def __add__(self, v):
-        #return vec3(self.e[0] + v.e[0], self.e[1] + v.e[1], self.e[2] + v.e[2])
-
-        #sum_e = self.e + v.e
-        #return vec3(sum_e[0], sum_e[1], sum_e[2])
         return vec3(self.e + v.e)
     
     def __sub__(self, v):
-        #return vec3(self.e[0] - v.e[0], self.e[1] - v.e[1], self.e[2] - v.e[2])
-
-        #sub_e = self.e - v.e
-        #return vec3(sub_e[0], sub_e[1], sub_e[2])
         return vec3(self.e - v.e)
     
     def __mul__(self, v):
-        #return vec3(self.e[0] * v.e[0], self.e[1] * v.e[1], self.e[2] * v.e[2])
-
-        #mul_e = self.e * v.e
-        #return vec3(mul_e[0], mul_e[1], mul_e[2])
-
         return vec3(self.e * v.e)
     
     def __mul__(self, t):
-        #return vec3(t*self.e[0], t*self.e[1], t*self.e[2])
-
-        #mul_e = self.e * t
-        #return vec3(mul_e[0], mul_e[1], mul_e[2])
         if isinstance(t, vec3):
             return vec3(self.e * t.e)
         else: 
@@ -88,22 +57,27 @@ class vec3:
     def __truediv__(self, t: float):
         return self * (1/t)
 
-    
+@njit
+def dotNumba(u: np.ndarray, v: np.ndarray) -> float: 
+    return np.dot(u, v)
+
 def dot(u: vec3, v: vec3) -> float: 
-    #return u.e[0]*v.e[0] + u.e[1]*v.e[1] + u.e[2]*v.e[2]
-    return np.dot(u.e, v.e)
+    return dotNumba(u.e,v.e)
+
+@njit
+def crossNumba(u: np.ndarray, v: np.ndarray) -> float: 
+    return np.linalg.cross(u, v)
 
 def cross(u: vec3, v: vec3) -> vec3:
-    #return vec3(u.e[1] * v.e[2] - u.e[2] * v.e[1],
-    #            u.e[2] * v.e[0] - u.e[0] * v.e[2],
-    #            u.e[0] * v.e[1] - u.e[1] * v.e[0])
-
-    cross_e = np.linalg.cross(u.e, v.e)
+    cross_e = crossNumba(u.e, v.e)
     return vec3(cross_e[0], cross_e[1], cross_e[2])
 
+@njit
+def normNumba(v: np.ndarray) -> float: 
+    return np.linalg.norm(v)
 
 def unit_vector(v: vec3) -> vec3 :
-    norm = np.linalg.norm(v.e)
+    norm = normNumba(v.e)
     if norm == 0:
         return v
     else:
@@ -128,5 +102,9 @@ def random_on_hemisphere(normal: vec3):
     else:
         return -on_unit_sphere
 
+@njit
+def reflectNumba(v: np.ndarray, n:np.ndarray):
+    return v - n*dotNumba(v,n)*2
+
 def reflect(v: vec3, n:vec3):
-    return v - n*dot(v,n)*2
+    return vec3(reflectNumba(v.e,n.e))
