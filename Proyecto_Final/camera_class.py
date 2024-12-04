@@ -6,7 +6,7 @@ import numpy as np
 from hittable_class import hittable, hit_record
 from hittable_list_class import hittable_list
 from sphere_class import sphere
-from rtweekend import infinity, random_double
+from rtweekend import infinity, random_double, degrees_to_radians
 from interval_class import interval
 from material_class import material
 
@@ -21,6 +21,8 @@ class camera:
     samples_per_pixel = 10
     max_depth = 10
 
+    vfov = 90
+
     def initialize(self):
 
         # Calculate image height, ensure it's at least 1
@@ -31,7 +33,9 @@ class camera:
         
         # Camera
         focal_length = 1.0
-        viewport_height = 2.0
+        theta = degrees_to_radians(self.vfov)
+        h = np.tan(theta/2)
+        viewport_height = 2 * h * focal_length
         viewport_width = viewport_height * (float(self.image_width)/self.image_height)
         self.center = point3(np.array([0, 0, 0]))
 
@@ -86,8 +90,10 @@ class camera:
         else:
             print(f'P3\n{self.image_width} {self.image_height}\n255\n')
 
+        loading = dots
+
         for j in range(self.image_height):
-            print(f'\rScanlines remaining {self.image_height-j}   {cajitas[j%12]}', file=sys.stderr)
+            print(f'\rScanlines remaining {self.image_height-j}   {loading[j%(len(loading))]}', file=sys.stderr)
             print ("\033[A\033[A", file=sys.stderr) 
             for i in range(self.image_width):
                 
@@ -97,10 +103,8 @@ class camera:
                     pixel_color = pixel_color + self.ray_color(r, self.max_depth, world)
                 write_color(filename, pixel_color*self.pixel_samples_scale)
         
-        print("\rDone.                 \n", file=sys.stderr)
+        print("\rDone :-)\n", file=sys.stderr)
 
-
-cajitas = ["▁","▃","▄","▅","▆","▇","█","▇","▆","▅","▄","▃"]
 
 zigzag = [
     "<3      ",
@@ -116,3 +120,39 @@ zigzag = [
     "  <3    ",
     " <3     ",
 ]
+
+snake = [   "⠋",
+			"⠙",
+			"⠸",
+			"⠴",
+			"⠦",
+			"⠇"]
+
+dots = [
+			".    ",
+			"..   ",
+			"...  ",
+            ".... ",
+			".....",
+			" ....",
+			"  ...",
+			"   ..",
+			"    ."]
+            
+bar = [
+			"[    ]",
+			"[=   ]",
+			"[==  ]",
+			"[=== ]",
+			"[====]",
+			"[ ===]",
+			"[  ==]",
+			"[   =]",
+			"[    ]",
+			"[   =]",
+			"[  ==]",
+			"[ ===]",
+			"[====]",
+			"[=== ]",
+			"[==  ]",
+			"[=   ]"]

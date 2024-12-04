@@ -7,6 +7,7 @@ from camera_class import camera
 from hittable_list_class import hittable_list
 from sphere_class import sphere
 from material_class import material, lambertian, metal, dielectric
+from rtweekend import pi
 
 color = vec3
 point3 = vec3
@@ -17,9 +18,9 @@ def main():
 
     world = hittable_list()
 
-    #world.add(sphere(point3(np.array([0,0,-1])), 0.5))      # Pelota
-    #world.add(sphere(point3(np.array([0,-100.5,-1])), 100)) # Piso
-#    material_left   = metal(color(np.array([0.8, 0.8, 0.8])), 0.3)
+    # world.add(sphere(point3(np.array([0,0,-1])), 0.5))      # Pelota
+    # world.add(sphere(point3(np.array([0,-100.5,-1])), 100)) # Piso
+    # material_left   = metal(color(np.array([0.8, 0.8, 0.8])), 0.3)
     
     material_ground = lambertian(color(np.array([0.8, 0.8, 0.0])))
     material_center = lambertian(color(np.array([0.1, 0.2, 0.5])))
@@ -33,12 +34,22 @@ def main():
     world.add(sphere(point3(np.array([-1.0,    0.0, -1.0])),   0.4, material_bubble))
     world.add(sphere(point3(np.array([ 1.0,    0.0, -1.0])),   0.5, material_right))
 
+    R = np.cos(pi/4)
+    
+    material_left = lambertian(color(np.array([0,0,1])))
+    material_right = lambertian(color(np.array([1,0,0])))
+
+    world.add(sphere(point3(np.array([-R, 0, -1])), R, material_left))
+    world.add(sphere(point3(np.array([ R, 0, -1])), R, material_right))
+
     cam = camera()
 
     cam.aspect_ratio = 16.0/9.0
     cam.image_width = 400
     cam.samples_per_pixel = 10
     cam.max_depth = 10
+
+    cam.vfov = 90
 
     cam.render(world, "bolas-fest.ppm")
 
