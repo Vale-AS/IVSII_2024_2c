@@ -34,20 +34,20 @@ def main():
     world.add(sphere(point3(np.array([-1.0,    0.0, -1.0])),   0.4, material_bubble))
     world.add(sphere(point3(np.array([ 1.0,    0.0, -1.0])),   0.5, material_right))
 
-    R = np.cos(pi/4)
-    
-    material_left = lambertian(color(np.array([0,0,1])))
-    material_right = lambertian(color(np.array([1,0,0])))
-
-    world.add(sphere(point3(np.array([-R, 0, -1])), R, material_left))
-    world.add(sphere(point3(np.array([ R, 0, -1])), R, material_right))
+    # R = np.cos(pi/4)
+    # 
+    # material_left = lambertian(color(np.array([0,0,1])))
+    # material_right = lambertian(color(np.array([1,0,0])))
+# 
+    # world.add(sphere(point3(np.array([-R, 0, -1])), R, material_left))
+    # world.add(sphere(point3(np.array([ R, 0, -1])), R, material_right))
 
     cam = camera()
 
     cam.aspect_ratio = 16.0/9.0
     cam.image_width = 400
-    cam.samples_per_pixel = 10
-    cam.max_depth = 10
+    cam.samples_per_pixel = 100
+    cam.max_depth = 50
 
     cam.vfov = 90
 

@@ -103,7 +103,7 @@ class camera:
                     pixel_color = pixel_color + self.ray_color(r, self.max_depth, world)
                 write_color(filename, pixel_color*self.pixel_samples_scale)
         
-        print("\rDone :-)\n", file=sys.stderr)
+        print("\rDone                           :-)\n", file=sys.stderr)
 
 
 zigzag = [
@@ -129,15 +129,15 @@ snake = [   "⠋",
 			"⠇"]
 
 dots = [
-			".    ",
-			"..   ",
-			"...  ",
-            ".... ",
-			".....",
-			" ....",
-			"  ...",
-			"   ..",
-			"    ."]
+			".       ",
+			"..      ",
+			"...     ",
+            "....    ",
+			".....   ",
+			" ....   ",
+			"  ...   ",
+			"   ..   ",
+			"    .   "]
             
 bar = [
 			"[    ]",
