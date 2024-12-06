@@ -22,6 +22,9 @@ class camera:
     max_depth = 10
 
     vfov = 90
+    lookfrom = point3(np.array([0,0,0]))
+    lookat = point3(np.array([0,0,-1]))
+    vup = vec3(np.array([0,1,0]))
 
     def initialize(self):
 
@@ -30,25 +33,34 @@ class camera:
         self.image_height = 1 if (self.image_height < 1) else self.image_height
         self.pixel_samples_scale = 1.0 / self.samples_per_pixel
 
-        
+        self.center = self.lookfrom
+
         # Camera
-        focal_length = 1.0
+        focal_length = (self.lookfrom - self.lookat).length()
         theta = degrees_to_radians(self.vfov)
         h = np.tan(theta/2)
         viewport_height = 2 * h * focal_length
         viewport_width = viewport_height * (float(self.image_width)/self.image_height)
-        self.center = point3(np.array([0, 0, 0]))
+        #self.center = point3(np.array([0, 0, 0]))
 
+        # Calculate the w,u,v unit basis vectors for the camera coordinate frame
+        w = unit_vector(self.lookfrom - self.lookat)
+        u = unit_vector(cross(self.vup, w))
+        v = cross(w, u)
+        
         # Calculate vectors across horizontal and down vertical viewport edges
-        viewport_u = vec3(np.array([viewport_width, 0, 0]))
-        viewport_v = vec3(np.array([0, -viewport_height, 0]))
+        #viewport_u = vec3(np.array([viewport_width, 0, 0]))
+        #viewport_v = vec3(np.array([0, -viewport_height, 0]))
 
+        viewport_u = u*viewport_width
+        viewport_v = -v*viewport_height
+        
         # Calculate horizontal and vertical delta vectores from pixel to pixel
         self.pixel_delta_u = viewport_u / self.image_width
         self.pixel_delta_v = viewport_v / self.image_height
 
         # Calculate location of upper left pixel
-        viewport_upper_left = self.center - vec3(np.array([0, 0, focal_length])) - viewport_u/2 - viewport_v/2
+        viewport_upper_left = self.center - (w*focal_length) - viewport_u/2 - viewport_v/2
         self.pixel00_loc = viewport_upper_left + (self.pixel_delta_u + self.pixel_delta_v) * 0.5
 
     def get_ray(self, i:int, j:int) -> ray:
@@ -90,7 +102,7 @@ class camera:
         else:
             print(f'P3\n{self.image_width} {self.image_height}\n255\n')
 
-        loading = dots
+        loading = hearts
 
         for j in range(self.image_height):
             print(f'\rScanlines remaining {self.image_height-j}   {loading[j%(len(loading))]}', file=sys.stderr)
@@ -119,6 +131,22 @@ zigzag = [
     "   <3   ",
     "  <3    ",
     " <3     ",
+]
+
+hearts = [
+    "3           ",
+    "<3          ",
+    "3<3         ",
+    "<3<3        ",
+    "3<3<3       ",
+    "<3<3<3      ",
+    " <3<3<3     ",
+    "  <3<3<3    ",
+    "   <3<3<    ",
+    "    <3<3    ",
+    "     <3<    ",
+    "      <3    "
+    "       <    "
 ]
 
 snake = [   "⠋",

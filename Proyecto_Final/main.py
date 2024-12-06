@@ -46,10 +46,13 @@ def main():
 
     cam.aspect_ratio = 16.0/9.0
     cam.image_width = 400
-    cam.samples_per_pixel = 100
-    cam.max_depth = 50
+    cam.samples_per_pixel = 10
+    cam.max_depth = 10
 
-    cam.vfov = 90
+    cam.vfov = 20
+    cam.lookfrom = point3(np.array([-2.0,2.0,1.0]))
+    cam.lookat   = point3(np.array([0.0,0.0,-1.0]))
+    cam.vup      = vec3(np.array([0.0,1.0,0.0]))
 
     cam.render(world, "bolas-fest.ppm")
 

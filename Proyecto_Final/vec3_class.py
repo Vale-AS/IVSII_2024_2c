@@ -65,12 +65,12 @@ def dot(u: vec3, v: vec3) -> float:
     return dotNumba(u.e,v.e)
 
 @njit
-def crossNumba(u: np.ndarray, v: np.ndarray) -> float: 
-    return np.linalg.cross(u, v)
+def crossNumba(u: np.ndarray, v: np.ndarray) -> np.ndarray: 
+    return np.cross(u, v)
 
 def cross(u: vec3, v: vec3) -> vec3:
     cross_e = crossNumba(u.e, v.e)
-    return vec3(cross_e[0], cross_e[1], cross_e[2])
+    return vec3(cross_e)
 
 @njit
 def normNumba(v: np.ndarray) -> float: 
