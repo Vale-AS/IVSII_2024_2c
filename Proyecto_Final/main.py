@@ -22,17 +22,17 @@ def main():
     # world.add(sphere(point3(np.array([0,-100.5,-1])), 100)) # Piso
     # material_left   = metal(color(np.array([0.8, 0.8, 0.8])), 0.3)
     
-    material_ground = lambertian(color(np.array([0.8, 0.8, 0.0])))
-    material_center = lambertian(color(np.array([0.1, 0.2, 0.5])))
+    material_ground = lambertian(color(0.8, 0.8, 0.0))
+    material_center = lambertian(color(0.1, 0.2, 0.5))
     material_left   = dielectric(1.50)
     material_bubble = dielectric(1.00/1.50)
-    material_right  = metal(color(np.array([0.8, 0.6, 0.2])), 1.0)
+    material_right  = metal(color(0.8, 0.6, 0.2), 1.0)
 
-    world.add(sphere(point3(np.array([ 0.0, -100.5, -1.0])), 100.0, material_ground))
-    world.add(sphere(point3(np.array([ 0.0,    0.0, -1.2])),   0.5, material_center))
-    world.add(sphere(point3(np.array([-1.0,    0.0, -1.0])),   0.5, material_left))
-    world.add(sphere(point3(np.array([-1.0,    0.0, -1.0])),   0.4, material_bubble))
-    world.add(sphere(point3(np.array([ 1.0,    0.0, -1.0])),   0.5, material_right))
+    world.add(sphere(point3( 0.0, -100.5, -1.0), 100.0, material_ground))
+    world.add(sphere(point3( 0.0,    0.0, -1.2),   0.5, material_center))
+    world.add(sphere(point3(-1.0,    0.0, -1.0),   0.5, material_left))
+    world.add(sphere(point3(-1.0,    0.0, -1.0),   0.4, material_bubble))
+    world.add(sphere(point3( 1.0,    0.0, -1.0),   0.5, material_right))
 
     # R = np.cos(pi/4)
     # 
@@ -49,12 +49,12 @@ def main():
     cam.samples_per_pixel = 10
     cam.max_depth = 10
 
-    cam.vfov = 20
-    cam.lookfrom = point3(np.array([-2.0,2.0,1.0]))
-    cam.lookat   = point3(np.array([0.0,0.0,-1.0]))
-    cam.vup      = vec3(np.array([0.0,1.0,0.0]))
+    cam.vfov = 90
+    cam.lookfrom = point3(-2.0,2.0,1.0)
+    cam.lookat   = point3(0.0,0.0,-1.0)
+    cam.vup      = vec3(0.0,1.0,0.0)
 
-    cam.render(world, "bolas-fest.ppm")
+    cam.render(world, "bolas-test.ppm")
 
 
 start = time.time()

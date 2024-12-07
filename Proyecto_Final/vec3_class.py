@@ -3,10 +3,16 @@ from rtweekend import random_double
 from numba import njit
 
 class vec3:
-    e = [None]*3
+    #e = [None]*3
 
-    def __init__(self, coords: np.ndarray):
-        self.e = coords
+    #def __init__(self, coords: np.ndarray):
+    #    self.e = coords
+
+    def __init__(self, e0, e1: float = None, e2: float = None):
+        if isinstance(e0, np.ndarray):
+            self.e = e0
+        elif isinstance(e0, (int,float)):
+            self.e = np.array([e0,e1,e2])
     
     def x(self): return self.e[0]
     def y(self): return self.e[1]
@@ -86,7 +92,7 @@ def unit_vector(v: vec3) -> vec3 :
     #return v / v.length()#return v / v.length()
 
 def random(min: float = 0, max: float = 1):
-        return vec3(np.array([random_double(min, max), random_double(min, max), random_double(min, max)]))
+        return vec3(random_double(min, max), random_double(min, max), random_double(min, max))
 
 def random_unit_vector():
     while(True):

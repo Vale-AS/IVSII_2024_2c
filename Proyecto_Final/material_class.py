@@ -48,7 +48,7 @@ class dielectric(material):
         self.refraction_index = refraction_index
     
     def scatter(self, r_in: ray, rec: hit_record):
-        attenuation = color(np.array([1.0, 1.0, 1.0]))
+        attenuation = color(1.0, 1.0, 1.0)
         ri = (1.0/self.refraction_index) if rec.front_face else self.refraction_index
         
         unit_direction = unit_vector(r_in.direction())

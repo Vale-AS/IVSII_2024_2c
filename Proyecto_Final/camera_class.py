@@ -22,9 +22,9 @@ class camera:
     max_depth = 10
 
     vfov = 90
-    lookfrom = point3(np.array([0,0,0]))
-    lookat = point3(np.array([0,0,-1]))
-    vup = vec3(np.array([0,1,0]))
+    lookfrom = point3(0,0,0)
+    lookat = point3(0,0,-1)
+    vup = vec3(0,1,0)
 
     def initialize(self):
 
@@ -72,24 +72,24 @@ class camera:
         return ray(ray_origin, ray_direction)
     
     def sample_square(self) -> vec3:
-        return vec3(np.array([random_double() - 0.5, random_double() - 0.5, 0.0]))
+        return vec3(random_double() - 0.5, random_double() - 0.5, 0.0)
 
     def ray_color(self, r: ray, depth: int, world: hittable) -> color:
         if depth <= 0:
-            return color(np.array([0,0,0]))
+            return color(0,0,0)
 
         does_hit, info_rec = world.hit(r, interval(0.001, infinity))
         if does_hit:
             has_material, scattered, attenuation = info_rec.mat.scatter(r, info_rec)
             if has_material:
                 return self.ray_color(scattered, depth-1, world) * attenuation
-            return color(np.array([0,0,0]))
+            return color(0,0,0)
             # direction = info_rec.normal + random_unit_vector()
             #return self.ray_color(ray(info_rec.p, direction), depth-1, world) * 0.5
 
         unit_direction = unit_vector(r.direction())
         a = 0.5*(unit_direction.y()+1.0)
-        return color(np.array([1.0,1.0,1.0]))*(1.0-a) + color(np.array([0.5,0.7,1.0]))*a
+        return color(1.0,1.0,1.0)*(1.0-a) + color(0.5,0.7,1.0)*a
         
 
     def render(self, world: hittable, filename: str = None):
@@ -109,7 +109,7 @@ class camera:
             print ("\033[A\033[A", file=sys.stderr) 
             for i in range(self.image_width):
                 
-                pixel_color = color(np.array([0,0,0]))
+                pixel_color = color(0,0,0)
                 for sample in range(self.samples_per_pixel):
                     r = self.get_ray(i, j)
                     pixel_color = pixel_color + self.ray_color(r, self.max_depth, world)
