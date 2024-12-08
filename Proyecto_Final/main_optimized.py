@@ -33,28 +33,28 @@ def main():
     ground_material = lambertian(color(0.5, 0.5, 0.5))
     world.add(sphere(point3(0.0,-1000.0,0.0), 1000.0, ground_material))
 
-    for a in range(-2, 2):
-        for b in range(-2, 2):
-            choose_mat = random_double()
-            center = point3(a + 0.9*random_double(), 0.2, b + 0.9*random_double())
-            if ((center - point3(4, 0.2, 0)).length() > 0.9):
-            
-                if (choose_mat < 0.8):
-                    # diffuse
-                    albedo = random() * random()
-                    sphere_material = lambertian(albedo)
-                    world.add(sphere(center, 0.2, sphere_material))
-                elif choose_mat < 0.95:
-                    # metal
-                    albedo = random(0.5, 1)
-                    fuzz = random_double(0, 0.5)
-                    sphere_material = metal(albedo, fuzz)
-                    world.add(sphere(center, 0.2, sphere_material))
-                else:
-                    # glass
-                    sphere_material = dielectric(1.5)
-                    world.add(sphere(center, 0.2, sphere_material))
-                
+    #for a in range(-11, 11):
+    #    for b in range(-11, 11):
+    #        choose_mat = random_double()
+    #        center = point3(a + 0.9*random_double(), 0.2, b + 0.9*random_double())
+    #        if ((center - point3(4, 0.2, 0)).length() > 0.9):
+    #        
+    #            if (choose_mat < 0.8):
+    #                # diffuse
+    #                albedo = random() * random()
+    #                sphere_material = lambertian(albedo)
+    #                world.add(sphere(center, 0.2, sphere_material))
+    #            elif choose_mat < 0.95:
+    #                # metal
+    #                albedo = random(0.5, 1)
+    #                fuzz = random_double(0, 0.5)
+    #                sphere_material = metal(albedo, fuzz)
+    #                world.add(sphere(center, 0.2, sphere_material))
+    #            else:
+    #                # glass
+    #                sphere_material = dielectric(1.5)
+    #                world.add(sphere(center, 0.2, sphere_material))
+    #            
     material1 = dielectric(1.5)
     world.add(sphere(point3(0, 1, 0), 1.0, material1))
 
@@ -83,19 +83,18 @@ def main():
 
     args = []
 
-        
     # Genero los argumentos para cada core
     for c in range(cores):
-
         file_path = f"./tmp/bolitas-{c+1}.txt"
         if os.path.isfile(file_path):
             os.remove(file_path)
 
         interval = range(int(c*height/cores), int((c+1)*height/cores))
-        args.append((world, interval, file_path))
+        args.append((world, interval, file_path, c))
 
     # Renderizo la escena usando todos los cores
     p = Pool(cores)
+    print("Lineas restantes de cada proceso:")
     p.map(cam.render, args)
     p.close()
 
@@ -113,7 +112,6 @@ def main():
                 for line in data:
                     file.write(line)
             os.remove(file_path)
-            
 
 start = time.time()
 main()

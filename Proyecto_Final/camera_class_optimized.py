@@ -6,6 +6,8 @@ import numpy as np
 from hittable_class import hittable
 from rtweekend import infinity, random_double, degrees_to_radians
 from interval_class import interval
+from blessings import Terminal
+
 
 color = vec3
 point3 = vec3
@@ -104,7 +106,7 @@ class camera:
 
     def render(self, args):
 
-        world, line_range, filename = args
+        world, line_range, filename, c = args
 
         self.initialize()
 
@@ -113,9 +115,11 @@ class camera:
 
         loading = hearts
 
+        line = 1
         for j in line_range:
-            # print(f'\rScanlines remaining {len(line_range)-j}   {loading[j%(len(loading))]}', file=sys.stderr)
-            # print ("\033[A\033[A", file=sys.stderr) 
+            
+            print(c*10*' ' + f"{c+1}: {len(line_range)-line}", file=sys.stderr)
+            print("\033[A\033[A",   file=sys.stderr) 
             for i in range(self.image_width):
                 
                 pixel_color = color(0,0,0)
@@ -123,9 +127,9 @@ class camera:
                     r = self.get_ray(i, j)
                     pixel_color = pixel_color + self.ray_color(r, self.max_depth, world)
                 write_color(filename, pixel_color*self.pixel_samples_scale)
-        
-        print("\rDone                           :-)\n", file=sys.stderr)
+            line = line + 1
 
+        print(f"\n Done process {c} :-) \n", file=sys.stderr)
 
 zigzag = [
     "<3      ",
