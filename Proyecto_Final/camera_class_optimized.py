@@ -1,14 +1,11 @@
-from vec3_class import vec3, dot, cross, unit_vector, random_on_hemisphere, random_unit_vector, random_in_unit_disk
+from vec3_class import vec3, cross, unit_vector, random_in_unit_disk
 from color_func import write_color
 from ray_class import ray
 import sys
 import numpy as np
-from hittable_class import hittable, hit_record
-from hittable_list_class import hittable_list
-from sphere_class import sphere
+from hittable_class import hittable
 from rtweekend import infinity, random_double, degrees_to_radians
 from interval_class import interval
-from material_class import material
 
 color = vec3
 point3 = vec3
@@ -107,7 +104,7 @@ class camera:
 
     def render(self, args):
 
-        world, line_range, filename, pixel_list = args
+        world, line_range, filename = args
 
         self.initialize()
 
@@ -125,7 +122,7 @@ class camera:
                 for sample in range(self.samples_per_pixel):
                     r = self.get_ray(i, j)
                     pixel_color = pixel_color + self.ray_color(r, self.max_depth, world)
-                write_color(filename, pixel_color*self.pixel_samples_scale, pixel_list)
+                write_color(filename, pixel_color*self.pixel_samples_scale)
         
         print("\rDone                           :-)\n", file=sys.stderr)
 

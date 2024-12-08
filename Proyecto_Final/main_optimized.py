@@ -1,17 +1,28 @@
 import time
 import sys
 import os
-import numpy as np
 from vec3_class import vec3, random
 from camera_class_optimized import camera
 from hittable_list_class import hittable_list
 from sphere_class import sphere
-from material_class import material, lambertian, metal, dielectric
-from rtweekend import pi, random_double
-from multiprocessing import Pool, Manager
+from material_class import lambertian, metal, dielectric
+from rtweekend import random_double
+from multiprocessing import Pool
 
 color = vec3
 point3 = vec3
+
+# Definimos el nombre del archivo final y la cantidad de cores a usar
+
+if len(sys.argv)>1:
+    file_name = sys.argv[1]
+else:
+    file_name = "bolas_fest.ppm"
+
+if len(sys.argv)>2 and int(sys.argv[2]) in range(1,16):
+    cores = int(sys.argv[2])
+else:
+    cores = 8
 
 def main():
 
@@ -22,28 +33,28 @@ def main():
     ground_material = lambertian(color(0.5, 0.5, 0.5))
     world.add(sphere(point3(0.0,-1000.0,0.0), 1000.0, ground_material))
 
-    #for a in range(-11, 11):
-    #    for b in range(-11, 11):
-    #        choose_mat = random_double()
-    #        center = point3(a + 0.9*random_double(), 0.2, b + 0.9*random_double())
-    #        if ((center - point3(4, 0.2, 0)).length() > 0.9):
-    #        
-    #            if (choose_mat < 0.8):
-    #                # diffuse
-    #                albedo = random() * random()
-    #                sphere_material = lambertian(albedo)
-    #                world.add(sphere(center, 0.2, sphere_material))
-    #            elif choose_mat < 0.95:
-    #                # metal
-    #                albedo = random(0.5, 1)
-    #                fuzz = random_double(0, 0.5)
-    #                sphere_material = metal(albedo, fuzz)
-    #                world.add(sphere(center, 0.2, sphere_material))
-    #            else:
-    #                # glass
-    #                sphere_material = dielectric(1.5)
-    #                world.add(sphere(center, 0.2, sphere_material))
-    #            
+    for a in range(-2, 2):
+        for b in range(-2, 2):
+            choose_mat = random_double()
+            center = point3(a + 0.9*random_double(), 0.2, b + 0.9*random_double())
+            if ((center - point3(4, 0.2, 0)).length() > 0.9):
+            
+                if (choose_mat < 0.8):
+                    # diffuse
+                    albedo = random() * random()
+                    sphere_material = lambertian(albedo)
+                    world.add(sphere(center, 0.2, sphere_material))
+                elif choose_mat < 0.95:
+                    # metal
+                    albedo = random(0.5, 1)
+                    fuzz = random_double(0, 0.5)
+                    sphere_material = metal(albedo, fuzz)
+                    world.add(sphere(center, 0.2, sphere_material))
+                else:
+                    # glass
+                    sphere_material = dielectric(1.5)
+                    world.add(sphere(center, 0.2, sphere_material))
+                
     material1 = dielectric(1.5)
     world.add(sphere(point3(0, 1, 0), 1.0, material1))
 
@@ -57,7 +68,7 @@ def main():
 
     cam.aspect_ratio      = 16.0 / 9.0
     cam.image_width       = 400
-    cam.samples_per_pixel = 10
+    cam.samples_per_pixel = 1
     cam.max_depth         = 5
 
     cam.vfov     = 20
@@ -67,47 +78,42 @@ def main():
 
     cam.defocus_angle = 0.6
     cam.focus_dist    = 10.0
-
-    cores = 8
     
-    line_ammount = 400 / 16.0 * 9.0
-
-    manager = Manager()
-    
-    pixel_list = []
-    pixel_list_list = []
+    height = 400 / 16.0 * 9.0
 
     args = []
+
         
     # Genero los argumentos para cada core
     for c in range(cores):
 
-        pixel_list = Manager().list()
-        pixel_list_list.append(pixel_list)
-        interval = range(int(c*line_ammount/cores), int((c+1)*line_ammount/cores))
-        args.append((world, interval, "", pixel_list))
+        file_path = f"./tmp/bolitas-{c+1}.txt"
+        if os.path.isfile(file_path):
+            os.remove(file_path)
 
-    # Renderizo para cada core
+        interval = range(int(c*height/cores), int((c+1)*height/cores))
+        args.append((world, interval, file_path))
+
+    # Renderizo la escena usando todos los cores
     p = Pool(cores)
     p.map(cam.render, args)
     p.close()
 
-    with open("bolas_en_memoria.ppm", "w") as f:
-        f.write(f'P3\n{400} {int(line_ammount)}\n255\n')
-        for pixels in pixel_list_list:
-            for pixel in pixels:
-                f.write(pixel)
-    
-    # Concateno los archivos
-    # with open("mega_bolas_fest.ppm", "w") as file:
-    #     file.write(f'P3\n{400} {int(line_ammount)}\n255\n')
-    # 
-    #     for c in range(cores):
-    #         file_name = f"bolas-fest-{c+1}.ppm" 
-    #         with open(file_name, "r") as f:
-    #             data = f.readlines()[3:]
-    #             for line in data:
-    #                 file.write(line)
+    if os.path.isfile(file_name):
+        os.remove(file_name)
+
+    #Concateno los archivos
+    with open(file_name, "w") as file:
+        file.write(f'P3\n{cam.image_width} {int(height)}\n255\n')
+
+        for c in range(cores):
+            file_path = f"./tmp/bolitas-{c+1}.txt"
+            with open(file_path, "r") as f:
+                data = f.readlines()
+                for line in data:
+                    file.write(line)
+            os.remove(file_path)
+            
 
 start = time.time()
 main()

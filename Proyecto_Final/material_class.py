@@ -1,4 +1,4 @@
-from hittable_class import hittable, hit_record
+from hittable_class import hit_record
 from ray_class import ray
 from vec3_class import vec3, random_unit_vector, reflect, unit_vector, dot, refract
 from rtweekend import random_double
