@@ -3,11 +3,12 @@ import sys
 import os
 import numpy as np
 from vec3_class import vec3, random
-from camera_class import camera
+from camera_class_optimized import camera
 from hittable_list_class import hittable_list
 from sphere_class import sphere
 from material_class import material, lambertian, metal, dielectric
 from rtweekend import pi, random_double
+from multiprocessing import Pool
 
 color = vec3
 point3 = vec3
@@ -18,49 +19,6 @@ def main():
 
     world = hittable_list()
 
-    # world.add(sphere(point3(np.array([0,0,-1])), 0.5))      # Pelota
-    # world.add(sphere(point3(np.array([0,-100.5,-1])), 100)) # Piso
-    # material_left   = metal(color(np.array([0.8, 0.8, 0.8])), 0.3)
-    
-    # material_ground = lambertian(color(0.8, 0.8, 0.0))
-    # material_center = lambertian(color(0.1, 0.2, 0.5))
-    # material_left   = dielectric(1.50)
-    # material_bubble = dielectric(1.00/1.50)
-    # material_right  = metal(color(0.8, 0.6, 0.2), 1.0)
-# 
-    # world.add(sphere(point3( 0.0, -100.5, -1.0), 100.0, material_ground))
-    # world.add(sphere(point3( 0.0,    0.0, -1.2),   0.5, material_center))
-    # world.add(sphere(point3(-1.0,    0.0, -1.0),   0.5, material_left))
-    # world.add(sphere(point3(-1.0,    0.0, -1.0),   0.4, material_bubble))
-    # world.add(sphere(point3( 1.0,    0.0, -1.0),   0.5, material_right))
-
-    # R = np.cos(pi/4)
-    # 
-    # material_left = lambertian(color(np.array([0,0,1])))
-    # material_right = lambertian(color(np.array([1,0,0])))
-# 
-    # world.add(sphere(point3(np.array([-R, 0, -1])), R, material_left))
-    # world.add(sphere(point3(np.array([ R, 0, -1])), R, material_right))
-
-    # cam = camera()
-# 
-    # cam.aspect_ratio = 16.0/9.0
-    # cam.image_width = 400
-    # cam.samples_per_pixel = 10
-    # cam.max_depth = 10
-# 
-    # cam.vfov = 20
-    # cam.lookfrom = point3(-2.0,2.0,1.0)
-    # cam.lookat   = point3(0.0,0.0,-1.0)
-    # cam.vup      = vec3(0.0,1.0,0.0)
-# 
-    # cam.defocus_angle = 10.0
-    # cam.focus_dist    = 3.4
-# 
-    # cam.render(world, "bolas-test.ppm")
-
-
-    # Final render
     ground_material = lambertian(color(0.5, 0.5, 0.5))
     world.add(sphere(point3(0.0,-1000.0,0.0), 1000.0, ground_material))
 
@@ -68,7 +26,7 @@ def main():
         for b in range(-11, 11):
             choose_mat = random_double()
             center = point3(a + 0.9*random_double(), 0.2, b + 0.9*random_double())
-
+   
             if ((center - point3(4, 0.2, 0)).length() > 0.9):
             
                 if (choose_mat < 0.8):
@@ -111,8 +69,31 @@ def main():
     cam.defocus_angle = 0.6
     cam.focus_dist    = 10.0
 
-    cam.render(world, "bolas-final-fest.ppm")
+    cores = 8
+    
+    p = Pool(cores)
+    line_ammount = 400 / 16.0 * 9.0
 
+    args = []
+
+    for c in range(cores):
+        interval = range(int(c*line_ammount/cores), int((c+1)*line_ammount/cores))
+        args.append((world, interval, f"bolas-fest-{c+1}.ppm"))
+
+    p.map(cam.render, args)
+
+    # Concateno los archivos
+    with open("mega_bolas_fest.ppm", "w") as file:
+        file.write(f'P3\n{400} {int(line_ammount)}\n255\n')
+    
+        # Unificar los archivos
+        for c in range(cores):
+            file_name = f"bolas-fest-{c+1}.ppm"
+
+            with open(file_name, "r") as f:
+                data = f.readlines()[3:]
+                for line in data:
+                    file.write(line)
 
 start = time.time()
 main()
