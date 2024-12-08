@@ -51,9 +51,6 @@ class camera:
         v = cross(w, u)
         
         # Calculate vectors across horizontal and down vertical viewport edges
-        #viewport_u = vec3(np.array([viewport_width, 0, 0]))
-        #viewport_v = vec3(np.array([0, -viewport_height, 0]))
-
         viewport_u = u*viewport_width
         viewport_v = -v*viewport_height
         
@@ -114,11 +111,8 @@ class camera:
 
         self.initialize()
 
-        if filename:
-            with open(filename, "w") as file:
-                file.write(f'P3\n{self.image_width} {len(line_range)}\n255\n')
-        else:
-            print(f'P3\n{self.image_width} {len(line_range)}\n255\n')
+        with open(filename, "w") as file:
+            file.write(f'P3\n{self.image_width} {len(line_range)}\n255\n')
 
         loading = hearts
 

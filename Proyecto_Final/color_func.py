@@ -18,8 +18,6 @@ def write_color(filename: str, pixel_color: color):
     gbyte = int(255.999 * intensity.clamp(g))
     bbyte = int(255.999 * intensity.clamp(b))
 
-    if filename:
-        with open(filename, 'a') as f:
-            f.write(f'{rbyte} {gbyte} {bbyte}\n')
-    else:
-        print(f'{rbyte} {gbyte} {bbyte}\n')
+    with open(filename, 'a') as f:
+        f.write(f'{rbyte} {gbyte} {bbyte}\n')
+   

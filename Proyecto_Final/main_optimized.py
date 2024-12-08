@@ -58,8 +58,8 @@ def main():
 
     cam.aspect_ratio      = 16.0 / 9.0
     cam.image_width       = 400
-    cam.samples_per_pixel = 10
-    cam.max_depth         = 5
+    cam.samples_per_pixel = 100
+    cam.max_depth         = 10
 
     cam.vfov     = 20
     cam.lookfrom = point3(13.0,2.0,3.0)
@@ -76,17 +76,18 @@ def main():
 
     args = []
 
+    # Genero los argumentos para cada core
     for c in range(cores):
         interval = range(int(c*line_ammount/cores), int((c+1)*line_ammount/cores))
         args.append((world, interval, f"bolas-fest-{c+1}.ppm"))
 
+    # Renderizo para cada core
     p.map(cam.render, args)
 
     # Concateno los archivos
     with open("mega_bolas_fest.ppm", "w") as file:
         file.write(f'P3\n{400} {int(line_ammount)}\n255\n')
     
-        # Unificar los archivos
         for c in range(cores):
             file_name = f"bolas-fest-{c+1}.ppm"
 
