@@ -17,7 +17,7 @@ point3 = vec3
 if len(sys.argv)>1:
     file_name = sys.argv[1]
 else:
-    file_name = "bolas_fest.ppm"
+    file_name = "raytraced_image.ppm"
 
 if len(sys.argv)>2 and int(sys.argv[2]) in range(1,16):
     cores = int(sys.argv[2])
@@ -85,7 +85,7 @@ def main():
 
     # Genero los argumentos para cada core
     for c in range(cores):
-        file_path = f"./tmp/bolitas-{c+1}.txt"
+        file_path = f"./tmp/image-piece-{c+1}.txt"
         if os.path.isfile(file_path):
             os.remove(file_path)
 
@@ -106,7 +106,7 @@ def main():
         file.write(f'P3\n{cam.image_width} {int(height)}\n255\n')
 
         for c in range(cores):
-            file_path = f"./tmp/bolitas-{c+1}.txt"
+            file_path = f"./tmp/image-piece-{c+1}.txt"
             with open(file_path, "r") as f:
                 data = f.readlines()
                 for line in data:

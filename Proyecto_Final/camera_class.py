@@ -1,14 +1,11 @@
-from vec3_class import vec3, dot, cross, unit_vector, random_on_hemisphere, random_unit_vector, random_in_unit_disk
+from vec3_class import vec3, cross, unit_vector, random_in_unit_disk
 from color_func import write_color
 from ray_class import ray
 import sys
 import numpy as np
-from hittable_class import hittable, hit_record
-from hittable_list_class import hittable_list
-from sphere_class import sphere
+from hittable_class import hittable
 from rtweekend import infinity, random_double, degrees_to_radians
 from interval_class import interval
-from material_class import material
 
 color = vec3
 point3 = vec3
@@ -51,9 +48,6 @@ class camera:
         v = cross(w, u)
         
         # Calculate vectors across horizontal and down vertical viewport edges
-        #viewport_u = vec3(np.array([viewport_width, 0, 0]))
-        #viewport_v = vec3(np.array([0, -viewport_height, 0]))
-
         viewport_u = u*viewport_width
         viewport_v = -v*viewport_height
         
@@ -77,7 +71,6 @@ class camera:
         offset = self.sample_square()
         pixel_sample = self.pixel00_loc + (self.pixel_delta_u * (i + offset.x())) + (self.pixel_delta_v * (j + offset.y()))
         
-        #ray_origin = self.center
         ray_origin = self.center if (self.defocus_angle <= 0) else self.defocus_disk_sample()
         ray_direction = pixel_sample - ray_origin
         return ray(ray_origin, ray_direction)
@@ -100,8 +93,6 @@ class camera:
             if has_material:
                 return self.ray_color(scattered, depth-1, world) * attenuation
             return color(0,0,0)
-            # direction = info_rec.normal + random_unit_vector()
-            #return self.ray_color(ray(info_rec.p, direction), depth-1, world) * 0.5
 
         unit_direction = unit_vector(r.direction())
         a = 0.5*(unit_direction.y()+1.0)

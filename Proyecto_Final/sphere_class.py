@@ -28,10 +28,8 @@ class sphere(hittable):
 
         # Find nearest root that lies in acceptable range
         root = (h - sqrtd) / a
-        #if (root <= ray_t.min or ray_t.max <= root):
         if not ray_t.surrounds(root):
             root = (h + sqrtd) / a
-            #if (root <= ray_t.min or ray_t.max <= root):
             if not ray_t.surrounds(root):
                 return False, None
         
@@ -39,7 +37,6 @@ class sphere(hittable):
 
         info_rec.t = root
         info_rec.p = r.at(info_rec.t)
-        #rec.normal = (rec.p - self.center) / self.radius
         outward_normal = (info_rec.p - self.center) / self.radius
         info_rec.set_face_normal(r, outward_normal)
         info_rec.mat = self.mat

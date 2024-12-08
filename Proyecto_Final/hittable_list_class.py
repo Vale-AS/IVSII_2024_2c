@@ -5,11 +5,6 @@ from interval_class import interval
 class hittable_list(hittable):
     objects = []
 
-    '''def __init__(self):
-        self.objects = []
-
-    def __init__(self, object: hittable):
-        self.add(object)'''
     
     def __init__(self, *, object: hittable = None):
         if object == None:

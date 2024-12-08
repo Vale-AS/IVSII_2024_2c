@@ -6,7 +6,6 @@ import numpy as np
 from hittable_class import hittable
 from rtweekend import infinity, random_double, degrees_to_radians
 from interval_class import interval
-from blessings import Terminal
 
 
 color = vec3
@@ -73,7 +72,6 @@ class camera:
         offset = self.sample_square()
         pixel_sample = self.pixel00_loc + (self.pixel_delta_u * (i + offset.x())) + (self.pixel_delta_v * (j + offset.y()))
         
-        #ray_origin = self.center
         ray_origin = self.center if (self.defocus_angle <= 0) else self.defocus_disk_sample()
         ray_direction = pixel_sample - ray_origin
         return ray(ray_origin, ray_direction)
@@ -96,8 +94,6 @@ class camera:
             if has_material:
                 return self.ray_color(scattered, depth-1, world) * attenuation
             return color(0,0,0)
-            # direction = info_rec.normal + random_unit_vector()
-            #return self.ray_color(ray(info_rec.p, direction), depth-1, world) * 0.5
 
         unit_direction = unit_vector(r.direction())
         a = 0.5*(unit_direction.y()+1.0)

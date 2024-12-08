@@ -6,8 +6,8 @@ from vec3_class import vec3, random
 from camera_class import camera
 from hittable_list_class import hittable_list
 from sphere_class import sphere
-from material_class import material, lambertian, metal, dielectric
-from rtweekend import pi, random_double
+from material_class import lambertian, metal, dielectric
+from rtweekend import random_double
 
 color = vec3
 point3 = vec3
@@ -57,7 +57,7 @@ def main():
     # cam.defocus_angle = 10.0
     # cam.focus_dist    = 3.4
 # 
-    # cam.render(world, "bolas-test.ppm")
+    # cam.render(world, "raytraced-image-test.ppm")
 
 
     # Final render
@@ -111,7 +111,7 @@ def main():
     cam.defocus_angle = 0.6
     cam.focus_dist    = 10.0
 
-    cam.render(world, "bolas-final-fest.ppm")
+    cam.render(world, "raytraced_image.ppm")
 
 
 start = time.time()
