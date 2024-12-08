@@ -107,12 +107,12 @@ class camera:
 
     def render(self, args):
 
-        world, line_range, filename = args
+        world, line_range, filename, pixel_list = args
 
         self.initialize()
 
-        with open(filename, "w") as file:
-            file.write(f'P3\n{self.image_width} {len(line_range)}\n255\n')
+        # with open(filename, "w") as file:
+        #     file.write(f'P3\n{self.image_width} {len(line_range)}\n255\n')
 
         loading = hearts
 
@@ -125,7 +125,7 @@ class camera:
                 for sample in range(self.samples_per_pixel):
                     r = self.get_ray(i, j)
                     pixel_color = pixel_color + self.ray_color(r, self.max_depth, world)
-                write_color(filename, pixel_color*self.pixel_samples_scale)
+                write_color(filename, pixel_color*self.pixel_samples_scale, pixel_list)
         
         print("\rDone                           :-)\n", file=sys.stderr)
 
