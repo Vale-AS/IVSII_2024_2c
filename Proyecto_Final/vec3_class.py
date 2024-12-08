@@ -122,3 +122,9 @@ def refract(uv: vec3, n: vec3, etai_over_etat: float):
     r_out_perp = (uv + n*cos_theta) * etai_over_etat
     r_out_parallel =  n * -np.sqrt(abs(1.0 - r_out_perp.length_squared()))
     return r_out_perp + r_out_parallel
+
+def random_in_unit_disk():
+    while True:
+        p = vec3(random_double(-1,1), random_double(-1,1), 0)
+        if (p.length_squared() < 1):
+            return p

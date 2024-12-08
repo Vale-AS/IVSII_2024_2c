@@ -1,4 +1,4 @@
-from vec3_class import vec3, dot, cross, unit_vector, random_on_hemisphere, random_unit_vector
+from vec3_class import vec3, dot, cross, unit_vector, random_on_hemisphere, random_unit_vector, random_in_unit_disk
 from color_func import write_color
 from ray_class import ray
 import sys
@@ -26,6 +26,9 @@ class camera:
     lookat = point3(0,0,-1)
     vup = vec3(0,1,0)
 
+    defocus_angle = 0
+    focus_dist = 10
+
     def initialize(self):
 
         # Calculate image height, ensure it's at least 1
@@ -39,10 +42,9 @@ class camera:
         focal_length = (self.lookfrom - self.lookat).length()
         theta = degrees_to_radians(self.vfov)
         h = np.tan(theta/2)
-        viewport_height = 2 * h * focal_length
+        viewport_height = 2 * h * self.focus_dist
         viewport_width = viewport_height * (float(self.image_width)/self.image_height)
-        #self.center = point3(np.array([0, 0, 0]))
-
+        
         # Calculate the w,u,v unit basis vectors for the camera coordinate frame
         w = unit_vector(self.lookfrom - self.lookat)
         u = unit_vector(cross(self.vup, w))
@@ -60,19 +62,33 @@ class camera:
         self.pixel_delta_v = viewport_v / self.image_height
 
         # Calculate location of upper left pixel
-        viewport_upper_left = self.center - (w*focal_length) - viewport_u/2 - viewport_v/2
+        viewport_upper_left = self.center - (w*self.focus_dist) - viewport_u/2 - viewport_v/2
         self.pixel00_loc = viewport_upper_left + (self.pixel_delta_u + self.pixel_delta_v) * 0.5
 
+        defocus_radius = self.focus_dist * np.tan(degrees_to_radians(self.defocus_angle / 2))
+        self.defocus_disk_u = u * defocus_radius
+        self.defocus_disk_v = v * defocus_radius
+
+
     def get_ray(self, i:int, j:int) -> ray:
+        # Construct a camera ray originating from the defocus disk and directed at a randomly
+        # sampled point around the pixel location i, j.
+
         offset = self.sample_square()
         pixel_sample = self.pixel00_loc + (self.pixel_delta_u * (i + offset.x())) + (self.pixel_delta_v * (j + offset.y()))
         
-        ray_origin = self.center
+        #ray_origin = self.center
+        ray_origin = self.center if (self.defocus_angle <= 0) else self.defocus_disk_sample()
         ray_direction = pixel_sample - ray_origin
         return ray(ray_origin, ray_direction)
     
     def sample_square(self) -> vec3:
         return vec3(random_double() - 0.5, random_double() - 0.5, 0.0)
+    
+    def defocus_disk_sample(self) -> point3:
+        # Returns a random point in the camera defocus disk.
+        p = random_in_unit_disk()
+        return self.center + (self.defocus_disk_u * p[0]) + (self.defocus_disk_v * p[1])
 
     def ray_color(self, r: ray, depth: int, world: hittable) -> color:
         if depth <= 0:

@@ -49,10 +49,13 @@ def main():
     cam.samples_per_pixel = 10
     cam.max_depth = 10
 
-    cam.vfov = 90
+    cam.vfov = 20
     cam.lookfrom = point3(-2.0,2.0,1.0)
     cam.lookat   = point3(0.0,0.0,-1.0)
     cam.vup      = vec3(0.0,1.0,0.0)
+
+    cam.defocus_angle = 10.0
+    cam.focus_dist    = 3.4
 
     cam.render(world, "bolas-test.ppm")
 
