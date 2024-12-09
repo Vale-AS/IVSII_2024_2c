@@ -68,7 +68,7 @@ def main():
 
     cam.aspect_ratio      = 16.0 / 9.0
     cam.image_width       = 400
-    cam.samples_per_pixel = 1
+    cam.samples_per_pixel = 10
     cam.max_depth         = 5
 
     cam.vfov     = 20
@@ -94,7 +94,7 @@ def main():
 
     # Renderizo la escena usando todos los cores
     p = Pool(cores)
-    print("Lineas restantes de cada proceso:")
+    print("Remaining lines from each process:")
     p.map(cam.render, args)
     p.close()
 
